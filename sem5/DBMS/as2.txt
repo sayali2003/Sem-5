@@ -1,0 +1,282 @@
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sayali             |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+
+mysql> use sayali;
+Database changed
+mysql> show tables;
++------------------+
+| Tables_in_sayali |
++------------------+
+| account          |
+| borrower         |
+| branch           |
+| customer         |
+| depositor        |
+| loan             |
+| view1            |
++------------------+
+7 rows in set (0.01 sec)
+
+mysql> select * from Customer;
++-----------+-------------+------------+
+| cust_name | cust_street | cust_city  |
++-----------+-------------+------------+
+| Anushka   | s05         | Beed       |
+| Kirti     | s03         | Jabalpur   |
+| Priya     | s08         | Pune       |
+| Sai       | s07         | Thane      |
+| Sam       | s02         | Pune       |
+| Sanchita  | s09         | Mumbai     |
+| Say       | s01         | Mumbai     |
+| Sejal     | s10         | Sindhudurg |
+| Shrushti  | s04         | Akola      |
+| Shulka    | s06         | Mumbai     |
++-----------+-------------+------------+
+10 rows in set (0.00 sec)
+
+mysql> select * from Branch;
++-------------+-------------+----------+
+| branch_name | branch_city | assets   |
++-------------+-------------+----------+
+| Akluj       | Solapur     | Farmland |
+| Akurdi      | Pune        | Bangles  |
+| Civillines  | Nagpur      | Laptop   |
+| Dharampeth  | Nagpur      | Gold     |
+| Girgaon     | Mumbai      | Gold     |
+| Grant_road  | Mumbai      | Bike     |
+| Mahalaxmi   | Mumbai      | House    |
+| Nigdi       | Pune        | Car      |
+| P_station   | Pune        | Ring     |
+| Swargate    | Pune        | Chain    |
++-------------+-------------+----------+
+10 rows in set (0.00 sec)
+
+mysql> select * from Account;
++--------+-------------+---------+
+| acc_no | branch_name | balance |
++--------+-------------+---------+
+|   1458 | Nigdi       |    5700 |
+|   1573 | Mahalaxmi   |   68000 |
+|   1623 | Nigdi       |    6290 |
+|   1966 | Akluj       |   69000 |
+|   2617 | Girgaon     |    7800 |
+|   3366 | Akurdi      |   27000 |
+|   7269 | P_station   |   15000 |
+|   7795 | Akurdi      |   13000 |
+|   8901 | Dharampeth  |   45000 |
+|   9161 | Grant_road  |    8000 |
++--------+-------------+---------+
+10 rows in set (0.00 sec)
+
+mysql> select * from Depositor;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Say       |   1573 |
+| Sam       |   2617 |
+| Shrushti  |   7795 |
+| Anushka   |   1458 |
+| Sanchita  |   8901 |
+| Shulka    |   7269 |
+| Sejal     |   1623 |
++-----------+--------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Loan;
++---------+-------------+--------+
+| loan_no | branch_name | amount |
++---------+-------------+--------+
+|     286 | Akurdi      |    750 |
+|     456 | Nigdi       |   3600 |
+|     542 | Swargate    |   3000 |
+|     776 | Akurdi      |   1800 |
+|     896 | Grant_road  |   7900 |
+|     911 | Akluj       |   5000 |
+|     986 | Nigdi       |   4800 |
++---------+-------------+--------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Borrower;
++-----------+---------+
+| cust_name | loan_no |
++-----------+---------+
+| Kirti     |     911 |
+| Shrushti  |     456 |
+| Sai       |     986 |
+| Anushka   |     776 |
+| Sejal     |     542 |
+| Shulka    |     896 |
++-----------+---------+
+6 rows in set (0.00 sec)
+
+mysql> select branch_name from Loan;
++-------------+
+| branch_name |
++-------------+
+| Akluj       |
+| Akurdi      |
+| Akurdi      |
+| Grant_road  |
+| Nigdi       |
+| Nigdi       |
+| Swargate    |
++-------------+
+7 rows in set (0.00 sec)
+
+mysql> select loan_no from Loan where branch_name='Akurdi' and amount>12000;
+Empty set (0.00 sec)
+
+mysql> select Borrower.cust_name, Borrower.loan_no, Loan.amount from Borrower join Loan on Borrower.loan_no=Loan.loan_no
+;
++-----------+---------+--------+
+| cust_name | loan_no | amount |
++-----------+---------+--------+
+| Kirti     |     911 |   5000 |
+| Shrushti  |     456 |   3600 |
+| Sai       |     986 |   4800 |
+| Anushka   |     776 |   1800 |
+| Sejal     |     542 |   3000 |
+| Shulka    |     896 |   7900 |
++-----------+---------+--------+
+6 rows in set (0.00 sec)
+
+mysql> select cust_name from Borrower join Loan on Borrower.loan_no=Loan.loan_no where branch_name='Akurdi' order by bra
+nch_name asc;
++-----------+
+| cust_name |
++-----------+
+| Anushka   |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> select cust_name from Customer union select cust_name from Borrower;
++-----------+
+| cust_name |
++-----------+
+| Anushka   |
+| Kirti     |
+| Priya     |
+| Sai       |
+| Sam       |
+| Sanchita  |
+| Say       |
+| Sejal     |
+| Shrushti  |
+| Shulka    |
++-----------+
+10 rows in set (0.00 sec)
+
+mysql> select cust_name from Customer intersect select cust_name from Borrower;
++-----------+
+| cust_name |
++-----------+
+| Anushka   |
+| Kirti     |
+| Sai       |
+| Sejal     |
+| Shrushti  |
+| Shulka    |
++-----------+
+6 rows in set (0.00 sec)
+
+mysql> select cust_name from Customer except select cust_name from Borrower;
++-----------+
+| cust_name |
++-----------+
+| Priya     |
+| Sam       |
+| Sanchita  |
+| Say       |
++-----------+
+4 rows in set (0.00 sec)
+
+mysql> select branch_name, avg(amount) from Loan group by branch_name;
++-------------+-------------+
+| branch_name | avg(amount) |
++-------------+-------------+
+| Akluj       |   5000.0000 |
+| Akurdi      |   1275.0000 |
+| Grant_road  |   7900.0000 |
+| Nigdi       |   4200.0000 |
+| Swargate    |   3000.0000 |
++-------------+-------------+
+5 rows in set (0.00 sec)
+
+mysql> select Account.branch_name, count(Depositor.cust_name) from Depositor join Account on Depositor.acc_no=Account.ac
+c_no group by branch_name;
++-------------+----------------------------+
+| branch_name | count(Depositor.cust_name) |
++-------------+----------------------------+
+| Mahalaxmi   |                          1 |
+| Girgaon     |                          1 |
+| Akurdi      |                          1 |
+| Nigdi       |                          2 |
+| Dharampeth  |                          1 |
+| P_station   |                          1 |
++-------------+----------------------------+
+6 rows in set (0.00 sec)
+
+mysql> select cust_name, cust_city from Customer where cust_name like 'P%';
++-----------+-----------+
+| cust_name | cust_city |
++-----------+-----------+
+| Priya     | Pune      |
++-----------+-----------+
+1 row in set (0.01 sec)
+
+mysql> select distinct branch_city from Branch;
++-------------+
+| branch_city |
++-------------+
+| Solapur     |
+| Pune        |
+| Nagpur      |
+| Mumbai      |
++-------------+
+4 rows in set (0.00 sec)
+
+mysql> select branch_name from Account group by branch_name having avg(balance)>12000;
++-------------+
+| branch_name |
++-------------+
+| Akluj       |
+| Akurdi      |
+| Dharampeth  |
+| Mahalaxmi   |
+| P_station   |
++-------------+
+5 rows in set (0.00 sec)
+
+mysql> select count(*) from Customer;
++----------+
+| count(*) |
++----------+
+|       10 |
++----------+
+1 row in set (0.01 sec)
+
+mysql> select sum(amount) from Loan;
++-------------+
+| sum(amount) |
++-------------+
+|       26850 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> delete from Loan where amount>1300 and amount<1500;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> delete from Branch where branch_city='Nigdi';
+Query OK, 0 rows affected (0.00 sec)

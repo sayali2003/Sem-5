@@ -1,0 +1,389 @@
+
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sayali             |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+
+mysql> use sayali;
+Database changed
+mysql> select * from Customer;
++-----------+-------------+------------+
+| cust_name | cust_street | cust_city  |
++-----------+-------------+------------+
+| Anushka   | s05         | Beed       |
+| Kirti     | s03         | Jabalpur   |
+| Priya     | s08         | Pune       |
+| Sai       | s07         | Thane      |
+| Sam       | s02         | Pune       |
+| Sanchita  | s09         | Mumbai     |
+| Say       | s01         | Mumbai     |
+| Sejal     | s10         | Sindhudurg |
+| Shrushti  | s04         | Akola      |
+| Shulka    | s06         | Mumbai     |
++-----------+-------------+------------+
+10 rows in set (0.00 sec)
+
+mysql> select * from Branch;
++-------------+-------------+----------+
+| branch_name | branch_city | assets   |
++-------------+-------------+----------+
+| Akluj       | Solapur     | Farmland |
+| Akurdi      | Pune        | Bangles  |
+| Civillines  | Nagpur      | Laptop   |
+| Dharampeth  | Nagpur      | Gold     |
+| Girgaon     | Mumbai      | Gold     |
+| Grant_road  | Mumbai      | Bike     |
+| Mahalaxmi   | Mumbai      | House    |
+| Nigdi       | Pune        | Car      |
+| P_station   | Pune        | Ring     |
+| Swargate    | Pune        | Chain    |
++-------------+-------------+----------+
+10 rows in set (0.00 sec)
+
+mysql> select * from Account;
++--------+-------------+---------+
+| acc_no | branch_name | balance |
++--------+-------------+---------+
+|   1458 | Nigdi       |    5700 |
+|   1573 | Mahalaxmi   |   68000 |
+|   1623 | Nigdi       |    6290 |
+|   1966 | Akluj       |   69000 |
+|   2617 | Girgaon     |    7800 |
+|   3366 | Akurdi      |   27000 |
+|   7269 | P_station   |   15000 |
+|   7795 | Akurdi      |   13000 |
+|   8901 | Dharampeth  |   45000 |
+|   9161 | Grant_road  |    8000 |
++--------+-------------+---------+
+10 rows in set (0.00 sec)
+
+mysql> select * from Depositor;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Say       |   1573 |
+| Sam       |   2617 |
+| Shrushti  |   7795 |
+| Anushka   |   1458 |
+| Sanchita  |   8901 |
+| Shulka    |   7269 |
+| Sejal     |   1623 |
++-----------+--------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Loan;
++---------+-------------+--------+
+| loan_no | branch_name | amount |
++---------+-------------+--------+
+|     286 | Akurdi      |    750 |
+|     456 | Nigdi       |   3600 |
+|     542 | Swargate    |   3000 |
+|     776 | Akurdi      |   1800 |
+|     896 | Grant_road  |   7900 |
+|     911 | Akluj       |   5000 |
+|     986 | Nigdi       |   4800 |
++---------+-------------+--------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Borrower;
++-----------+---------+
+| cust_name | loan_no |
++-----------+---------+
+| Kirti     |     911 |
+| Shrushti  |     456 |
+| Sai       |     986 |
+| Anushka   |     776 |
+| Sejal     |     542 |
+| Shulka    |     896 |
++-----------+---------+
+6 rows in set (0.00 sec)
+
+Q1)
+mysql> create view view1 as select cust_name from Borrower join Loan on Borrower.loan_no=Loan.loan_no where branch_name='P_station' order by cust_name;
+Query OK, 0 rows affected (0.01 sec)
+
+Q2)
+mysql> create view view2 as select branch_name, branch_city from Branch;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> insert into view2 values('Nanachowk','Mumbai');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> update view2 set branch_name='Hajiali' where branch_name='Nanachowk';
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> delete from view2 where branch_name='Hajiali';
+Query OK, 1 row affected (0.01 sec)
+
+Q3)
+mysql> create view view3 as select cust_name from Borrower union select cust_name from Depositor;
+Query OK, 0 rows affected (0.01 sec)
+
+Q4)
+mysql> create view view4 as
+    -> select C.cust_name, A.acc_no, NULL as loan_no
+    -> from Customer C
+    -> LEFT JOIN Depositor D ON C.cust_name = D.cust_name
+    -> LEFT JOIN Account A ON D.acc_no = A.Acc_no
+    -> UNION
+    -> SELECT C.cust_name, NULL AS Acc_no, L.loan_no
+    -> FROM Customer C
+    -> LEFT JOIN Borrower B ON C.cust_name = B.cust_name
+    -> LEFT JOIN Loan L ON B.loan_no = L.loan_no;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select * from view4;
++-----------+--------+---------+
+| cust_name | acc_no | loan_no |
++-----------+--------+---------+
+| Anushka   |   1458 |    NULL |
+| Kirti     |   NULL |    NULL |
+| Priya     |   NULL |    NULL |
+| Sai       |   NULL |    NULL |
+| Sam       |   2617 |    NULL |
+| Sanchita  |   8901 |    NULL |
+| Say       |   1573 |    NULL |
+| Sejal     |   1623 |    NULL |
+| Shrushti  |   7795 |    NULL |
+| Shulka    |   7269 |    NULL |
+| Anushka   |   NULL |     776 |
+| Kirti     |   NULL |     911 |
+| Sai       |   NULL |     986 |
+| Sam       |   NULL |    NULL |
+| Sanchita  |   NULL |    NULL |
+| Say       |   NULL |    NULL |
+| Sejal     |   NULL |     542 |
+| Shrushti  |   NULL |     456 |
+| Shulka    |   NULL |     896 |
++-----------+--------+---------+
+19 rows in set (0.00 sec)
+
+mysql> select * from view1;
+Empty set (0.00 sec)
+
+mysql> select * from view2;
++-------------+-------------+
+| branch_name | branch_city |
++-------------+-------------+
+| Akluj       | Solapur     |
+| Akurdi      | Pune        |
+| Civillines  | Nagpur      |
+| Dharampeth  | Nagpur      |
+| Girgaon     | Mumbai      |
+| Grant_road  | Mumbai      |
+| Mahalaxmi   | Mumbai      |
+| Nigdi       | Pune        |
+| P_station   | Pune        |
+| Swargate    | Pune        |
++-------------+-------------+
+10 rows in set (0.00 sec)
+
+mysql> select * from view3;
++-----------+
+| cust_name |
++-----------+
+| Anushka   |
+| Kirti     |
+| Sai       |
+| Sejal     |
+| Shrushti  |
+| Shulka    |
+| Sam       |
+| Sanchita  |
+| Say       |
++-----------+
+9 rows in set (0.00 sec)
+
+mysql> create index index1 on Customer(cust_name);
+Query OK, 0 rows affected (0.10 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create unique index index1 on Branch(branch_name);
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> show index from Customer;
++----------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table    | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++----------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| customer |          0 | PRIMARY  |            1 | cust_name   | A         |           8 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| customer |          1 | index1   |            1 | cust_name   | A         |          10 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++----------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+2 rows in set (0.03 sec)
+
+mysql> show index from Branch;
++--------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table  | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++--------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| branch |          0 | PRIMARY  |            1 | branch_name | A         |          10 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| branch |          0 | index1   |            1 | branch_name | A         |          10 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++--------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+2 rows in set (0.00 sec)
+
+mysql> truncate table Customer;
+ERROR 1701 (42000): Cannot truncate a table referenced in a foreign key constraint (`sayali`.`borrower`, CONSTRAINT `borrower_ibfk_1`)
+mysql> create table Companies (comp_id char(10) primary key, name char(10), cost int(10), yearint(10));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(10))' at line 1
+
+PART 2
+
+mysql> create table Companies (comp_id char(10) primary key, name char(10), cost int(10), year int(10));
+Query OK, 0 rows affected, 2 warnings (0.05 sec)
+
+mysql> create table Orders (comp_id char(10), foreign key (comp_id) references Companies(comp_id), domain char(10), quantity int(10))
+;
+Query OK, 0 rows affected, 1 warning (0.05 sec)
+
+mysql> insert into Companies values('C001','ONGC',2000,2010);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into Companies values('C002','HPCL',2500,2012);
+Query OK, 1 row affected (0.01 sec)
+
+mysql>  insert into Companies values('C005','IOCL',1000,2014);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into Companies values('C006','BHEL',3000,2015);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from Companies;
++---------+------+------+------+
+| comp_id | name | cost | year |
++---------+------+------+------+
+| C001    | ONGC | 2000 | 2010 |
+| C002    | HPCL | 2500 | 2012 |
+| C005    | IOCL | 1000 | 2014 |
+| C006    | BHEL | 3000 | 2015 |
++---------+------+------+------+
+4 rows in set (0.00 sec)
+
+mysql> insert into Orders values('C001','oil',109);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into Orders values('C002','gas',121);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into Orders values('C005','telecom',115);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from Orders;
++---------+---------+----------+
+| comp_id | domain  | quantity |
++---------+---------+----------+
+| C001    | oil     |      109 |
+| C002    | gas     |      121 |
+| C005    | telecom |      115 |
++---------+---------+----------+
+3 rows in set (0.00 sec)
+
+Q1)
+mysql> select name, cost, domain, quantity from companies inner join
+    -> Orders on Orders.comp_id=Companies.comp_id;
++------+------+---------+----------+
+| name | cost | domain  | quantity |
++------+------+---------+----------+
+| ONGC | 2000 | oil     |      109 |
+| HPCL | 2500 | gas     |      121 |
+| IOCL | 1000 | telecom |      115 |
++------+------+---------+----------+
+3 rows in set (0.00 sec)
+
+Q2)
+mysql>  select name, cost, domain, quantity from companies left join
+    -> orders on orders.comp_id=companies.comp_id;
++------+------+---------+----------+
+| name | cost | domain  | quantity |
++------+------+---------+----------+
+| ONGC | 2000 | oil     |      109 |
+| HPCL | 2500 | gas     |      121 |
+| IOCL | 1000 | telecom |      115 |
+| BHEL | 3000 | NULL    |     NULL |
++------+------+---------+----------+
+4 rows in set (0.00 sec)
+
+Q3)
+mysql>  select name, cost, domain, quantity from companies right join
+    -> orders on orders.comp_id=companies.comp_id;
++------+------+---------+----------+
+| name | cost | domain  | quantity |
++------+------+---------+----------+
+| ONGC | 2000 | oil     |      109 |
+| HPCL | 2500 | gas     |      121 |
+| IOCL | 1000 | telecom |      115 |
++------+------+---------+----------+
+3 rows in set (0.00 sec)
+
+Q4
+mysql>  select name, cost from companies join orders on
+    -> orders.comp_id=companies.comp_id
+    -> union
+    -> select domain, quantity from orders join companies on
+    -> orders.comp_id=companies.comp_id;
++---------+------+
+| name    | cost |
++---------+------+
+| ONGC    | 2000 |
+| HPCL    | 2500 |
+| IOCL    | 1000 |
+| oil     |  109 |
+| gas     |  121 |
+| telecom |  115 |
++---------+------+
+6 rows in set (0.00 sec)
+
+Q5)
+mysql> create view vieww1 as select name, quantity from companies, orders
+    -> where companies.comp_id=orders.comp_id;
+Query OK, 0 rows affected (0.01 sec)
+
+Q6)
+mysql> create view vieww2 as select branch_name, branch_city from branch;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>  insert into vieww2 values("Faridabad","delhi");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> update vieww2 set branch_city='Ahmednagar' where branch_name='Faridabad';
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>  delete from vieww2 where branch_name='Faridabad';
+Query OK, 1 row affected (0.01 sec)
+
+Q7)
+select * from vieww1' at line 1
+mysql> select * from vieww1;
++------+----------+
+| name | quantity |
++------+----------+
+| ONGC |      109 |
+| HPCL |      121 |
+| IOCL |      115 |
++------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select * from vieww2;
++-------------+-------------+
+| branch_name | branch_city |
++-------------+-------------+
+| Akluj       | Solapur     |
+| Akurdi      | Pune        |
+| Civillines  | Nagpur      |
+| Dharampeth  | Nagpur      |
+| Girgaon     | Mumbai      |
+| Grant_road  | Mumbai      |
+| Mahalaxmi   | Mumbai      |
+| Nigdi       | Pune        |
+| P_station   | Pune        |
+| Swargate    | Pune        |
++-------------+-------------+
+10 rows in set (0.00 sec)
